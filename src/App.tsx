@@ -1,16 +1,68 @@
-import { Search, Compass, CreditCard, Wifi, Contact2, MessageSquare } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  Search, Compass, MessageSquare,
+  Contact2, Wifi, CreditCard, Key, CalendarX2, FileWarning,
+  Trash2, Building, Shield, ClipboardCheck, FileText, VolumeX,
+  Droplet, Shirt, BookX, Utensils, Lock, BatteryCharging,
+  Lamp, DoorOpen, HelpCircle, Loader2
+} from "lucide-react";
 import { motion } from "motion/react";
 import Header from "./components/Header";
 import StatsCard from "./components/StatsCard";
 import GuideCard from "./components/GuideCard";
 import AdminPanel from "./components/AdminPanel";
 import BottomNav from "./components/BottomNav";
+import ChatPanel from "./components/ChatPanel";
+import { fetchGuides, type Guide } from "./services/api";
+
+const iconMap: Record<string, React.ReactNode> = {
+  "id-card": <Contact2 className="w-6 h-6" />,
+  "book-open": <Compass className="w-6 h-6" />,
+  "key": <Key className="w-6 h-6" />,
+  "calendar-x": <CalendarX2 className="w-6 h-6" />,
+  "file-warning": <FileWarning className="w-6 h-6" />,
+  "trash": <Trash2 className="w-6 h-6" />,
+  "building": <Building className="w-6 h-6" />,
+  "shield": <Shield className="w-6 h-6" />,
+  "clipboard-check": <ClipboardCheck className="w-6 h-6" />,
+  "file-text": <FileText className="w-6 h-6" />,
+  "volume-x": <VolumeX className="w-6 h-6" />,
+  "droplet": <Droplet className="w-6 h-6" />,
+  "shirt": <Shirt className="w-6 h-6" />,
+  "book-x": <BookX className="w-6 h-6" />,
+  "utensils": <Utensils className="w-6 h-6" />,
+  "lock": <Lock className="w-6 h-6" />,
+  "battery-charging": <BatteryCharging className="w-6 h-6" />,
+  "lamp": <Lamp className="w-6 h-6" />,
+  "door-open": <DoorOpen className="w-6 h-6" />,
+  "help-circle": <HelpCircle className="w-6 h-6" />,
+  "wifi": <Wifi className="w-6 h-6" />,
+  "credit-card": <CreditCard className="w-6 h-6" />,
+};
 
 export default function App() {
+  const [guides, setGuides] = useState<Guide[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    fetchGuides()
+      .then((data) => setGuides(data.guides))
+      .catch(() => setGuides([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filteredGuides = guides.filter(
+    (g) =>
+      g.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      g.keywords.some((k) => k.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   return (
     <div className="min-h-screen pb-24 md:pb-10">
       <Header />
-      
+
       <main className="pt-24 px-6 max-w-7xl mx-auto">
         {/* Mobile Search */}
         <div className="md:hidden mb-8">
@@ -20,6 +72,8 @@ export default function App() {
               className="w-full bg-surface-container border border-outline-variant rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:border-primary transition-all font-sans text-on-background"
               placeholder="Search campus guide..."
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
@@ -27,7 +81,7 @@ export default function App() {
         {/* Bento Grid Section */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Welcome Card */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="md:col-span-8 p-8 rounded-xl bg-surface-container border border-primary/20 relative overflow-hidden flex flex-col justify-end min-h-[350px]"
@@ -43,14 +97,17 @@ export default function App() {
             </div>
             <div className="relative z-10">
               <h1 className="font-headline font-extrabold text-4xl mb-2 neon-text-pink">
-                Welcome back, Student 2024
+                Welcome to BDU Smart Guide
               </h1>
               <p className="text-on-surface-variant max-w-lg mb-6">
                 Need a hand navigating the digital layers of BDU? Your smart guide is synced and ready to assist.
               </p>
               <div className="flex gap-3">
-                <button className="px-6 py-2 bg-primary/20 border border-primary rounded-lg font-label text-sm text-primary hover:bg-primary/30 transition-all uppercase tracking-wider">
-                  Quick Map
+                <button
+                  onClick={() => setChatOpen(true)}
+                  className="px-6 py-2 bg-primary/20 border border-primary rounded-lg font-label text-sm text-primary hover:bg-primary/30 transition-all uppercase tracking-wider"
+                >
+                  Ask AI Guide
                 </button>
                 <button className="px-6 py-2 bg-secondary/20 border border-secondary rounded-lg font-label text-sm text-secondary hover:bg-secondary/30 transition-all uppercase tracking-wider">
                   Campus News
@@ -69,48 +126,47 @@ export default function App() {
             <h2 className="font-headline text-2xl font-bold mb-6 flex items-center gap-2">
               <Compass className="text-secondary w-6 h-6" />
               Essential Survival Guides
+              {!loading && (
+                <span className="text-sm font-label text-on-surface-variant font-normal ml-2">
+                  ({filteredGuides.length} guides)
+                </span>
+              )}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <GuideCard
-                icon={<Contact2 className="w-6 h-6" />}
-                title="Lost ID Card"
-                tag="Urgent"
-                tagColor="primary"
-                points={[
-                  "Lock card via the app immediately",
-                  "Visit Admin Center Building C"
-                ]}
-                warning="Don't share temporary gate codes"
-                footerLabel="OFFICE: BLDG C, RM 104"
-                footerAction="START GUIDE"
-              />
-              <GuideCard
-                icon={<Wifi className="w-6 h-6" />}
-                title="Campus WiFi"
-                tag="Tech Support"
-                tagColor="secondary"
-                points={[
-                  "Use BDU_SECURE for encryption",
-                  "SSO Login with Student Email"
-                ]}
-                warning="Don't use public BDU_GUEST for exams"
-                footerLabel="IT HUB: LIBRARY LVL 2"
-                footerAction="SETTINGS"
-              />
-              <GuideCard
-                icon={<CreditCard className="w-6 h-6" />}
-                title="Meal Credit"
-                tag="Finance"
-                tagColor="tertiary"
-                points={[
-                  "Top-up via Kiosk or App Portal",
-                  "Credits expire every semester"
-                ]}
-                warning="Don't transfer credits to peers"
-                footerLabel="CAFETERIA MAIN HALL"
-                footerAction="TOP UP"
-              />
-            </div>
+
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                <span className="ml-3 text-on-surface-variant font-label">Loading guides...</span>
+              </div>
+            ) : filteredGuides.length === 0 ? (
+              <div className="text-center py-20 text-on-surface-variant">
+                <HelpCircle className="w-12 h-12 mx-auto mb-4 text-slate-600" />
+                <p className="font-headline text-lg">No guides found</p>
+                <p className="text-sm mt-1">Try a different search term</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {filteredGuides.map((guide, idx) => (
+                  <motion.div
+                    key={guide.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05, duration: 0.3 }}
+                  >
+                    <GuideCard
+                      icon={iconMap[guide.icon] || <HelpCircle className="w-6 h-6" />}
+                      title={guide.title}
+                      tag={guide.tag}
+                      tagColor={guide.tagColor}
+                      points={guide.steps.slice(0, 2)}
+                      warning={guide.dont[0]}
+                      footerLabel={guide.office}
+                      footerAction="VIEW GUIDE"
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -118,12 +174,18 @@ export default function App() {
       </main>
 
       {/* FAB for Chatbot */}
-      <button className="fixed bottom-24 right-6 md:bottom-10 md:right-10 w-16 h-16 rounded-full bg-primary text-white shadow-[0_0_20px_rgba(255,45,120,0.6)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 group">
-        <MessageSquare className="w-8 h-8 group-hover:rotate-12 transition-transform fill-current" />
+      <button
+        onClick={() => setChatOpen((prev) => !prev)}
+        className="fab-glow fixed bottom-24 right-6 md:bottom-10 md:right-10 w-16 h-16 rounded-full bg-primary text-white shadow-[0_0_20px_rgba(255,45,120,0.6)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 group"
+      >
+        <MessageSquare className={`w-8 h-8 transition-transform fill-current ${chatOpen ? "rotate-12" : "group-hover:rotate-12"}`} />
         <div className="absolute -top-12 right-0 bg-surface-container border border-primary text-primary px-3 py-1 rounded-lg text-xs font-label opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-          Ask AI Guide
+          {chatOpen ? "Close Chat" : "Ask AI Guide"}
         </div>
       </button>
+
+      {/* Chat Panel */}
+      <ChatPanel isOpen={chatOpen} onClose={() => setChatOpen(false)} />
 
       <BottomNav />
 

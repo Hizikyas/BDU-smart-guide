@@ -26,6 +26,21 @@
       linear-gradient(90deg, rgba(255, 45, 120, 0.05) 1px, transparent 1px);
     background-size: 40px 40px;
   }
+
+  /* Custom scrollbar for chat */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(255, 45, 120, 0.3);
+    border-radius: 9999px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 45, 120, 0.5);
+  }
 }
 
 @layer utilities {
@@ -43,5 +58,23 @@
     background: rgba(10, 10, 18, 0.8);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255, 45, 120, 0.3);
+  }
+  .chat-glass {
+    background: rgba(14, 14, 28, 0.92);
+    backdrop-filter: blur(20px);
+  }
+}
+
+/* FAB Pulse Glow */
+.fab-glow {
+  animation: fab-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes fab-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 45, 120, 0.5), 0 0 40px rgba(255, 45, 120, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 45, 120, 0.7), 0 0 60px rgba(255, 45, 120, 0.25);
   }
 }
