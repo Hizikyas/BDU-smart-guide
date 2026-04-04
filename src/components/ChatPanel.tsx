@@ -1,5 +1,14 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Bot, User, CheckCircle, AlertTriangle, MapPin, Loader2 } from "lucide-react";
+import {
+  X,
+  Send,
+  Bot,
+  User,
+  CheckCircle,
+  AlertTriangle,
+  MapPin,
+  Loader2,
+} from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { askQuestion, type AskResponse } from "../services/api";
 
@@ -29,6 +38,16 @@ export default function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const hasGuideContent = (guide?: AskResponse) => {
+    if (!guide) return false;
+    return Boolean(
+      (guide.steps && guide.steps.length > 0) ||
+      (guide.dont && guide.dont.length > 0) ||
+      guide.office ||
+      guide.message,
+    );
+  };
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -44,7 +63,11 @@ export default function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
     if (!q || isLoading) return;
 
     const userMsg: Message = { id: Date.now(), type: "user", text: q };
-    const loadingMsg: Message = { id: Date.now() + 1, type: "bot", loading: true };
+    const loadingMsg: Message = {
+      id: Date.now() + 1,
+      type: "bot",
+      loading: true,
+    };
 
     setMessages((prev) => [...prev, userMsg, loadingMsg]);
     setInput("");
@@ -53,15 +76,19 @@ export default function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
     try {
       const guide = await askQuestion(q);
       setMessages((prev) =>
-        prev.map((m) => (m.loading ? { ...m, loading: false, guide } : m))
+        prev.map((m) => (m.loading ? { ...m, loading: false, guide } : m)),
       );
     } catch {
       setMessages((prev) =>
         prev.map((m) =>
           m.loading
-            ? { ...m, loading: false, text: "⚠️ Connection error. Make sure the backend server is running." }
-            : m
-        )
+            ? {
+                ...m,
+                loading: false,
+                text: "⚠️ Connection error. Make sure the backend server is running.",
+              }
+            : m,
+        ),
       );
     } finally {
       setIsLoading(false);
@@ -133,33 +160,56 @@ export default function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
                           <Loader2 className="w-4 h-4 animate-spin text-primary" />
                           <span className="text-xs">Thinking...</span>
                         </div>
-                      ) : msg.guide ? (
+                      ) : hasGuideContent(msg.guide) ? (
                         <div className="space-y-3">
-                          <p className="font-medium text-secondary text-xs uppercase tracking-wider font-label">
-                            📋 Here's your guide:
-                          </p>
-                          <div className="space-y-1.5">
-                            {msg.guide.steps.map((s, i) => (
-                              <div key={i} className="flex items-start gap-2">
-                                <CheckCircle className="w-3.5 h-3.5 text-secondary mt-0.5 shrink-0" />
-                                <span className="text-on-surface-variant text-xs">{s}</span>
+                          {msg.guide?.message && (
+                            <p className="text-on-surface-variant text-xs leading-relaxed">
+                              {msg.guide.message}
+                            </p>
+                          )}
+
+                          {msg.guide?.steps && msg.guide.steps.length > 0 && (
+                            <>
+                              <p className="font-medium text-secondary text-xs uppercase tracking-wider font-label">
+                                📋 Here's your guide:
+                              </p>
+                              <div className="space-y-1.5">
+                                {msg.guide.steps.map((s, i) => (
+                                  <div
+                                    key={i}
+                                    className="flex items-start gap-2"
+                                  >
+                                    <CheckCircle className="w-3.5 h-3.5 text-secondary mt-0.5 shrink-0" />
+                                    <span className="text-on-surface-variant text-xs">
+                                      {s}
+                                    </span>
+                                  </div>
+                                ))}
                               </div>
-                            ))}
-                          </div>
-                          {msg.guide.dont.length > 0 && (
+                            </>
+                          )}
+
+                          {msg.guide?.dont && msg.guide.dont.length > 0 && (
                             <div className="space-y-1.5 pt-1">
                               {msg.guide.dont.map((d, i) => (
                                 <div key={i} className="flex items-start gap-2">
                                   <AlertTriangle className="w-3.5 h-3.5 text-red-400 mt-0.5 shrink-0" />
-                                  <span className="text-red-400/80 text-xs">{d}</span>
+                                  <span className="text-red-400/80 text-xs">
+                                    {d}
+                                  </span>
                                 </div>
                               ))}
                             </div>
                           )}
-                          <div className="flex items-center gap-1.5 pt-2 border-t border-outline-variant">
-                            <MapPin className="w-3 h-3 text-tertiary" />
-                            <span className="text-tertiary text-[10px] font-label uppercase">{msg.guide.office}</span>
-                          </div>
+
+                          {msg.guide?.office && (
+                            <div className="flex items-center gap-1.5 pt-2 border-t border-outline-variant">
+                              <MapPin className="w-3 h-3 text-tertiary" />
+                              <span className="text-tertiary text-[10px] font-label uppercase">
+                                {msg.guide.office}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <p className="text-on-surface-variant">{msg.text}</p>

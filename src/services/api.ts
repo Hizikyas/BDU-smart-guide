@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 export interface Guide {
   id: string;
@@ -25,9 +25,10 @@ export interface StatsResponse {
 }
 
 export interface AskResponse {
-  steps: string[];
-  dont: string[];
-  office: string;
+  steps: string[] | null;
+  dont: string[] | null;
+  office: string | null;
+  message?: string | null;
 }
 
 export async function fetchGuides(): Promise<GuidesResponse> {
@@ -43,7 +44,7 @@ export async function fetchStats(): Promise<StatsResponse> {
 }
 
 export async function askQuestion(question: string): Promise<AskResponse> {
-  const res = await fetch(`${API_BASE}/ask`, {
+  const res = await fetch(`${API_BASE}/ask?format=friendly`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ question }),
