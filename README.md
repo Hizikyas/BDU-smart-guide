@@ -8,7 +8,14 @@ Your campus survival companion with a neon-futuristic aesthetic! **BDU Smart Gui
 - **Responsive Layout:** Beautiful across desktops and mobile viewing, sporting a handy bottom navigation.
 - **Smart Assistance Integrations:** Features elements leveraging `@google/genai` for clever features.
 - **Interactive Dashboards & Statistics:** Monitor activities with intuitive UI components like the `StatsCard` and `AdminPanel`.
-- **Organized Knowledge Items:** Information delivered via styled components like `GuideCard`.
+- **AI Document Parsing System:** The `AdminPanel` boasts a dedicated pipeline to ingest raw, unstructured manuals. The backend LLM translates and structures it automatically into live interactive `GuideCards` on Firebase!
+- **Organized Knowledge Items:** Real-time data from Firestore delivered via beautiful components like `GuideCard`.
+- **Campus News Integration:** Quick-access links redirecting to official University resources natively within the UI.
+
+## 📚 Detailed Documentation
+
+Looking for deep architectural details on components, state management, and the `api.ts` flow? Check out our newly curated technical breakdown:
+👉 **[FRONTEND_ARCHITECTURE.md](./FRONTEND_ARCHITECTURE.md)**
 
 ## 🛠️ Tech Stack
 

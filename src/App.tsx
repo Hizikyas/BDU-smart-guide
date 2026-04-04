@@ -110,7 +110,9 @@ export default function App() {
                 >
                   Ask AI Guide
                 </button>
-                <button className="px-6 py-2 bg-secondary/20 border border-secondary rounded-lg font-label text-sm text-secondary hover:bg-secondary/30 transition-all uppercase tracking-wider">
+                <button 
+                  onClick={() => window.open("https://www.bdu.edu.et/", "_blank")}
+                  className="px-6 py-2 bg-secondary/20 border border-secondary rounded-lg font-label text-sm text-secondary hover:bg-secondary/30 transition-all uppercase tracking-wider">
                   Campus News
                 </button>
               </div>
