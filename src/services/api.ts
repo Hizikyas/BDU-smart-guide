@@ -1,5 +1,15 @@
 const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
+if (API_BASE.includes("127.0.0.1") || API_BASE.includes("localhost")) {
+  // Remind developers to set the hosted backend URL in env when still pointing locally
+  // This log helps detect when the app is still using the local fallback.
+  // Set `VITE_API_URL` in a `.env` file to point to your hosted backend (see .env.example).
+  // eslint-disable-next-line no-console
+  console.warn(
+    "Using local API fallback. Set VITE_API_URL in .env to point to your hosted backend.",
+  );
+}
+
 export interface Guide {
   id: string;
   title: string;
@@ -59,7 +69,9 @@ export interface GenerateGuideResponse {
   status: string;
 }
 
-export async function generateGuideFromDocument(documentText: string): Promise<GenerateGuideResponse> {
+export async function generateGuideFromDocument(
+  documentText: string,
+): Promise<GenerateGuideResponse> {
   const res = await fetch(`${API_BASE}/admin/generate-guide`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -69,7 +81,10 @@ export async function generateGuideFromDocument(documentText: string): Promise<G
   return res.json();
 }
 
-export async function updateGuide(guideId: string, guideData: any): Promise<any> {
+export async function updateGuide(
+  guideId: string,
+  guideData: any,
+): Promise<any> {
   const res = await fetch(`${API_BASE}/guides/${guideId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
