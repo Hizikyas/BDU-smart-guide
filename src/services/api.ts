@@ -1,10 +1,7 @@
-const API_BASE = import.meta.env.VITE_API_URL || "https://bdu-smartguide-production.up.railway.app";
+const API_BASE = (import.meta.env.VITE_API_URL || "https://bdu-smartguide-production.up.railway.app").replace(/\/$/, "");
 
 if (API_BASE.includes("127.0.0.1") || API_BASE.includes("localhost")) {
-  // Remind developers to set the hosted backend URL in env when still pointing locally
-  // This log helps detect when the app is still using the local fallback.
-  // Set `VITE_API_URL` in a `.env` file to point to your hosted backend (see .env.example).
-  // eslint-disable-next-line no-console
+
   console.warn(
     "Using local API fallback. Set VITE_API_URL in .env to point to your hosted backend.",
   );
