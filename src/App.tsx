@@ -45,6 +45,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showAllGuides, setShowAllGuides] = useState(false);
 
   useEffect(() => {
     fetchGuides()
@@ -109,7 +110,9 @@ export default function App() {
                 >
                   Ask AI Guide
                 </button>
-                <button className="px-6 py-2 bg-secondary/20 border border-secondary rounded-lg font-label text-sm text-secondary hover:bg-secondary/30 transition-all uppercase tracking-wider">
+                <button 
+                  onClick={() => window.open("https://www.bdu.edu.et/", "_blank")}
+                  className="px-6 py-2 bg-secondary/20 border border-secondary rounded-lg font-label text-sm text-secondary hover:bg-secondary/30 transition-all uppercase tracking-wider">
                   Campus News
                 </button>
               </div>
@@ -145,27 +148,39 @@ export default function App() {
                 <p className="text-sm mt-1">Try a different search term</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {filteredGuides.map((guide, idx) => (
-                  <motion.div
-                    key={guide.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05, duration: 0.3 }}
-                  >
-                    <GuideCard
-                      icon={iconMap[guide.icon] || <HelpCircle className="w-6 h-6" />}
-                      title={guide.title}
-                      tag={guide.tag}
-                      tagColor={guide.tagColor}
-                      points={guide.steps.slice(0, 2)}
-                      warning={guide.dont[0]}
-                      footerLabel={guide.office}
-                      footerAction="VIEW GUIDE"
-                    />
-                  </motion.div>
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {(showAllGuides ? filteredGuides : filteredGuides.slice(0, 6)).map((guide, idx) => (
+                    <motion.div
+                      key={guide.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05, duration: 0.3 }}
+                    >
+                      <GuideCard
+                        icon={iconMap[guide.icon] || <HelpCircle className="w-6 h-6" />}
+                        title={guide.title}
+                        tag={guide.tag}
+                        tagColor={guide.tagColor}
+                        points={guide.steps.slice(0, 2)}
+                        warning={guide.dont[0]}
+                        footerLabel={guide.office}
+                        footerAction="VIEW GUIDE"
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+                {filteredGuides.length > 6 && (
+                  <div className="mt-8 flex justify-center">
+                    <button
+                      onClick={() => setShowAllGuides(!showAllGuides)}
+                      className="px-6 py-2 bg-surface-container border border-primary/50 rounded-lg font-label text-sm text-primary hover:bg-primary/20 transition-all uppercase tracking-wider"
+                    >
+                      {showAllGuides ? "Show Less" : "View All"}
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
